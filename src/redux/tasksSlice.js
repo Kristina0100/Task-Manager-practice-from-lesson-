@@ -1,16 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchTasks, addTask, deleteTask, toggleCompleted } from './operations';
 
-  // Ви напевно вже звернули увагу на те, що код редюсерів, які обробляють pending та rejected екшени всіх операцій, ідентичний. Винесемо логіку цих редюсерів у функції, що допоможе нам скоротити дублювання коду.
-
-const handlePending = state => {
+const handlePending = (state) => {
   state.isLoading = true;
 };
 
 const handleRejected = (state, action) => {
   state.isLoading = false;
   state.error = action.payload;
-}
+};
 
 const tasksSlice = createSlice({
   name: 'tasks',
@@ -21,7 +19,7 @@ const tasksSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-       .addCase(fetchTasks.pending, handlePending)
+      .addCase(fetchTasks.pending, handlePending)
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
@@ -39,22 +37,23 @@ const tasksSlice = createSlice({
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
-        state.items = state.items.filter(
-          (task) => task.id !== action.payload.id
+        const index = state.items.findIndex(
+          (task) => task.id === action.payload.id
         );
+        state.items.splice(index, 1);
       })
       .addCase(deleteTask.rejected, handleRejected)
       .addCase(toggleCompleted.pending, handlePending)
       .addCase(toggleCompleted.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
-        state.items = state.items.map((task) =>
-          task.id === action.payload.id ? action.payload : task
+        const index = state.items.findIndex(
+          (task) => task.id === action.payload.id
         );
+        state.items.splice(index, 1, action.payload);
       })
       .addCase(toggleCompleted.rejected, handleRejected);
   },
 });
 
-
-export default tasksSlice.reducer;
+export const tasksReducer = tasksSlice.reducer;

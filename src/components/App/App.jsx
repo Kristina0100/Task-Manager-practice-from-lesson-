@@ -1,28 +1,27 @@
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTasks } from '../../redux/operations';
+import { useEffect } from 'react';
+import { Layout } from './Layout/Layout';
+import { AppBar } from './AppBar/AppBar';
+import { TaskForm } from './TaskForm/TaskForm';
+import { TaskList } from './TaskList/TaskList';
+import { fetchTasks } from '../redux/operations';
+import { selectError, selectIsLoading } from '../redux/selectors';
 
-
-import { AppBar } from '../AppBar/AppBar';
-import { TaskForm } from '../TaskForm/TaskForm';
-import { TaskList } from '../TaskList/TaskList';
-import css from './App.module.css';
-
-export default function App() {
+export const App = () => {
   const dispatch = useDispatch();
-  const isLoading = useSelector((state) => state.tasks.isLoading);
-  const error = useSelector((state) => state.tasks.error);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
 
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
   return (
-    <div className={css.container}>
+    <Layout>
       <AppBar />
       <TaskForm />
-      {isLoading && !error && <b>Request in progress...</b>} 
+      {isLoading && !error && <b>Request in progress...</b>}
       <TaskList />
-    </div>
+    </Layout>
   );
-}
+};
